@@ -1,0 +1,11 @@
+{
+    "name": "echo",
+    "description": "echo demo",
+    "url": "https://github.com/sundayliu/echo",
+    "readme": "echo demo",
+    "readmeFilename":"README.md",
+    "main": "./lib/echo.js",
+    "dependencies": {
+        "argv": "0.0.2"
+    }
+}
