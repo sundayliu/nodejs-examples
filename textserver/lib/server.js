@@ -91,11 +91,12 @@ function validateFiles(pathnames, callback){
 
 
 function main(argv){
+    console.log("server.js main function start");
   var config = JSON.parse(fs.readFileSync(argv[0],'utf-8'));
   var root = config.root||'.';
   var port = config.port || 80;  // if config not set port default set 80
   
-  http.createServer(function(request,response){
+  var server = http.createServer(function(request,response){
     console.log(request.url);
     var urlInfo = parseURL(root, request.url);
     /*
@@ -128,6 +129,12 @@ function main(argv){
       }
     });
   }).listen(port);
+  
+  process.on('SIGTERM', function(){
+      server.close(function(){
+          process.exit(0);
+      });
+  });
 }
 
-main(process.argv.slice(2));
+ main(process.argv.slice(2));
