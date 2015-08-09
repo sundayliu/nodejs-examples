@@ -1,6 +1,8 @@
 var querystring = require("querystring")
 var fs = require("fs");
-function start(response, postData){
+var formidable = require("formidable");
+
+function start(response, request){
     console.log("[handler start]Request handler `start ` was called");
     
     var body = "<html>" 
@@ -8,10 +10,10 @@ function start(response, postData){
         + '<meta http-equiv="Content-Type" content="text/html; charset="UTF-8" />'
         + "</head>"
         + "<body>"
-        + '<form action="/upload" method="post">'
-        + '<textarea name="text" rows="20" cols="80"></textarea>'
+        + '<form action="/upload" method="post" enctype="multipart/form-data">'
+        + '<input type="file" name="upload" />'
         + '<br />'
-        + '<input type="submit" value="Submit text" />'
+        + '<input type="submit" value="upload file" />'
         + '</form>'
         + "</body>"
         + "</html>";
@@ -21,17 +23,25 @@ function start(response, postData){
         response.end();
 }
 
-function upload(response, postData){
+function upload(response, request){
     console.log("[handler upload]Request handler `upload ` was called");
-    response.writeHead(200, {"Content-Type":"text/plain"});
-    response.write("You've sent the text:" + 
-        querystring.parse(postData).text);
-    response.end();
+    
+    var form = new formidable.IncomingForm();
+    console.log("about to parse");
+    form.parse(request, function(error, fields, files){
+        console.log("parsing done");
+        fs.renameSync(files.upload.path, "d:/cygwin/tmp/test.png");
+         response.writeHead(200, {"Content-Type":"text/html"});
+         response.write("received image:<br />");
+         response.write("<img src='/show' />");
+         response.end();
+    });
+   
 }
 
-function show(response, postData){
+function show(response, request){
     console.log("[handler show]Request handler 'show' was called");
-    fs.readFile("/tmp/test.png", "binary", function(error, file){
+    fs.readFile("d:/cygwin/tmp/test.png", "binary", function(error, file){
         if (error){
             response.writeHead(500, {"Content-Type":"text/plain"});
             response.write(error + "\n");
